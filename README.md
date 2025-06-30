@@ -1,4 +1,4 @@
-# 🧠 AI/ML Project Playground — Learning by Slaying 💅
+# 🧠 AI/ML Project Playground:
 
 Welcome to my **AI/ML Journey Hub**, where I build mini-projects while learning cutting-edge tools & concepts like **Librosa**, **HuggingFace Transformers**, **AutoML**, **Docker**, **MLflow**, and more — all in preparation for FAANG-level mastery.
 
