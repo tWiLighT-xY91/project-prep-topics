@@ -8,9 +8,10 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 # Load model, scaler and encoder
-model = pickle.load(open("emotion_model.pkl", "rb"))
-scaler = pickle.load(open("scaler.pkl", "rb"))
-le = pickle.load(open("label_encoder.pkl", "rb"))
+BASE_DIR = os.path.dirname(__file__)
+model = pickle.load(open(os.path.join(BASE_DIR, "emotion_model.pkl"), "rb"))
+scaler = pickle.load(open(os.path.join(BASE_DIR, "scaler.pkl"), "rb"))
+le = pickle.load(open(os.path.join(BASE_DIR, "label_encoder.pkl"), "rb"))
 
 UPLOAD_FOLDER = "uploads"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
