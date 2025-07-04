@@ -5,7 +5,8 @@ import pickle
 import os
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates")
+
 
 # Load model, scaler and encoder
 BASE_DIR = os.path.dirname(__file__)
