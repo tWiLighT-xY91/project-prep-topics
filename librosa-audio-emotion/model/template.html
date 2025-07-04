@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Classifier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #f3f4f6;
+            --accent-color: #a5b4fc;
+            --text-color: #111827;
+            --light-text: #6b7280;
+            --bg-color: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--light-text);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .upload-section {
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-icon img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .file-input-label:hover {
+            background-color: #4338ca;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-name {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        .analyze-btn {
+            padding: 0.75rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .analyze-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .analyze-btn:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            background-color: var(--secondary-color);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .emotion-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .emotion-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .emotion-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .emotion-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .selected-emotion {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 2rem;
+            text-align: center;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            margin-top: 1rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .emotion-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .upload-section,
+            .result-section {
+                padding: 1.5rem;
+            }
+
+            .emotion-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-icon {
+                width: 80px;
+                height: 80px;
+            }
+
+            .upload-icon img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Emotion Classifier</h1>
+            <p class="subtitle">Upload an audio file (.wav) to analyze and predict the emotional content</p>
+        </header>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-icon">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/9ea725b2-1932-45c0-8c3b-1b256bcecc19.png"
+                        alt="Microphone icon representing audio upload functionality" />
+                </div>
+
+                <label for="fileInput" class="file-input-label">Choose Audio File</label>
+                <p class="file-name" id="fileName">No file selected</p>
+                <form method="POST" action="/predict" enctype="multipart/form-data">
+                    <input type="file" name="file" accept=".wav,.wave" required />
+                    <button class="analyze-btn" type="submit">Analyze Emotion</button>
+                </form>
+
+
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p>Analyzing audio file...</p>
+                </div>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h2 class="result-title">Analysis Results</h2>
+
+                <audio id="audioPlayer" controls class="audio-player"></audio>
+
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <div class="emotion-cards" id="emotionCards">
+                    <!-- Emotion cards will be populated here -->
+                </div>
+
+                <div class="selected-emotion" id="selectedEmotion">
+                    Detected Emotion: {{ prediction }}
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Audio Emotion Prediction System © 2023</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                document.getElementById('analyzeBtn').disabled = false;
+
+                // Preview the audio file
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = URL.createObjectURL(file);
+            } else {
+                document.getElementById('fileName').textContent = 'No file selected';
+                document.getElementById('analyzeBtn').disabled = true;
+            }
+        });
+
+        document.getElementById('analyzeBtn').addEventListener('click', function () {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) return;
+
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultSection = document.getElementById('resultSection');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            // Show loading state
+            loadingIndicator.style.display = 'block';
+            analyzeBtn.disabled = true;
+
+            // Simulate analysis (replace with actual API call to your Flask backend)
+            setTimeout(function () {
+                // Hide loading indicator
+                loadingIndicator.style.display = 'none';
+
+                // Show results section
+                resultSection.style.display = 'block';
+
+                // Generate mock results (replace with actual API response)
+                const emotions = [
+                    { name: 'Happy', value: 82 },
+                    { name: 'Sad', value: 15 },
+                    { name: 'Angry', value: 10 },
+                    { name: 'Neutral', value: 45 },
+                    { name: 'Excited', value: 63 },
+                    { name: 'Calm', value: 28 }
+                ];
+
+                // Populate emotion cards
+                const emotionCardsContainer = document.getElementById('emotionCards');
+                emotionCardsContainer.innerHTML = '';
+
+                emotions.forEach(emotion => {
+                    const card = document.createElement('div');
+                    card.className = 'emotion-card';
+                    card.innerHTML = `
+                        <div class="emotion-name">${emotion.name}</div>
+                        <div class="emotion-value">${emotion.value}%</div>
+                    `;
+                    emotionCardsContainer.appendChild(card);
+                });
+
+                // Show selected emotion (highest value)
+                const selectedEmotion = emotions.reduce((prev, current) =>
+                    (prev.value > current.value) ? prev : current
+                );
+
+                document.getElementById('selectedEmotion').textContent =
+                    `Detected Emotion: ${selectedEmotion.name}`;
+
+                // Progress bar animation
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 1;
+                    document.getElementById('progressBar').style.width = `${progress}%`;
+
+                    if (progress >= selectedEmotion.value) {
+                        clearInterval(interval);
+                    }
+                }, 20);
+
+            }, 2500); // 2.5 second delay to simulate processing
+        });
+
+        // Audio player progress tracking
+        document.getElementById('audioPlayer').addEventListener('timeupdate', function () {
+            const progressBar = document.getElementById('progressBar');
+            const duration = this.duration || 1;
+            progressBar.style.width = `${(this.currentTime / duration) * 100}%`;
+        });
+    </script>
+</body>
+
+</html>
